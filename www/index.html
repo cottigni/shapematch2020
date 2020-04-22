@@ -39,12 +39,12 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
 
     // put your code here (you can delete this sample code)
 
-    const background = frame.asset("appbacking.png").alp(0.3);
+    const background = frame.asset("appbacking.png").alp(0.2);
     const page1 = new Container(stageW,stageH);
     page1.backing = new Rectangle(page1.width, page1.height).addTo(page1);
     background.addTo(page1.backing).sca("stageH*2");
     page1.triangle = new Triangle(80,80,80,white)
-      .alp(0.8)
+      .alp(0.9)
       .hov(1)
       .center(page1);
 
@@ -262,13 +262,13 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
       page1.setBounds(stageW,stageH);
       page1.backing.siz(stageW, stageH);
       page1.triangle.center();
-      page1.title.pos(10,100);
-      page1.proceed.pos(40,600);
+      page1.title.pos(7,100);
+      page1.proceed.pos(45,600);
 
       page2.setBounds(stageW,stageH);
       page2.backing.siz(stageW, stageH);
       page2.triangle.center();
-      page2.play.pos(60,400);
+      page2.play.pos(100,450);
 
       pages.resize();
     });
