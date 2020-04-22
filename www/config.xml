@@ -2,10 +2,10 @@
 
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
-        id        = "com.robcottignies.shapematch202"
+        id        = "com.robcottignies.shapematch2020"
         version   = "3.0.1">
 
-    <name>Tilty</name>
+    <name>ShapeMatch2020</name>
 
     <description>
         Mobile game help shape matching skills for kids!
