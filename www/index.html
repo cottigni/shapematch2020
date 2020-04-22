@@ -1,0 +1,296 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Shape Match 2020</title>
+
+<script src="https://zimjs.org/cdn/1.2.4/createjs.js"></script>
+<script src="https://zimjs.org/cdn/10.8.0/zim.js"></script>
+
+<script>
+
+// SCALING OPTIONS
+// scaling can have values as follows with full being the default
+// "fit"	sets canvas and stage to dimensions and scales to fit inside window size
+// "outside"	sets canvas and stage to dimensions and scales to fit outside window size
+// "full"	sets stage to window size with no scaling
+// "tagID"	add canvas to HTML tag of ID - set to dimensions if provided - no scaling
+
+const scaling = "full"; // this will resize to fit inside the screen dimensions
+const width =  null;
+const height = null;
+const color = dark; // ZIM colors like green, blue, pink, faint, clear, etc.
+const outerColor = dark; // any HTML colors like "violet", "#333", etc. are fine to use
+
+const path = "assets/";
+const assets = ["appbacking.png"];
+
+const frame = new Frame(scaling, width, height, color, outerColor, assets, path);
+frame.on("ready", () => { // ES6 Arrow Function - like function(){}
+    zog("ready from ZIM Frame"); // logs in console (F12 - choose console)
+
+    const stage = frame.stage;
+    let stageW = frame.width;
+    let stageH = frame.height;
+
+    // see https://zimjs.com/learn.html for video and code tutorials
+    // see https://zimjs.com/docs.html for documentation
+    // see https://zimjs.com/bits.html for 64 Interactive Media techniques
+
+    // put your code here (you can delete this sample code)
+
+    const background = frame.asset("appbacking.png").alp(0.3);
+    const page1 = new Container(stageW,stageH);
+    page1.backing = new Rectangle(page1.width, page1.height).addTo(page1);
+    background.addTo(page1.backing).sca("stageH*2");
+    page1.triangle = new Triangle(80,80,80,white)
+      .alp(0.8)
+      .hov(1)
+      .rot(90)
+      .center(page1);
+
+    page1.title = new Label({
+      text:"Welcome to Shape Match 2020",
+      size:35,
+      font:"helvetica",
+      color:"white"
+    }).addTo(page1).pos(frame.width*0.20,100);
+
+    page1.proceed = new Label({
+      text:"Click Play to proceed",
+      size:20,
+      font:"helvetica",
+      color:"white"
+    }).addTo(page1).pos(frame.width*0.25,600);
+
+      page1.triangle.on("mousedown",()=>{
+        //pages.go(page2,"right","slide")
+        pages.go(page2,"right")
+      });
+
+    const page2 = new Container(stageW,stageH);
+    page2.backing = new Rectangle(page2.width, page2.height, light).addTo(page2);
+    page2.triangle = new Triangle(80,80,80,dark)
+      .alp(0.8)
+      .hov(1)
+      .rot(90)
+      .center(page2);
+
+      page2.play = new Label({
+        text:"Click Play to start",
+        size:20,
+        font:"helvetica",
+        color:dark
+      }).addTo(page2).pos(frame.width*0.35,600);
+
+    page2.triangle.on("mousedown",()=>{
+
+      STYLE = {
+          color:"#35a7ff",
+          borderColor:dark,
+          borderWidth:4,
+          centerReg:{add:false},
+          clone:false
+      }
+
+      // these are what we drag
+      var shapesList = [
+          new Rectangle(80,80),
+          new Circle(40),
+          new Triangle(80,80,80)
+      ];
+
+      // these are what we drag to
+      STYLE.color = yellow;
+      var targetsList = [
+          new Rectangle(80,80),
+          new Circle(40),
+          new Triangle(80,80,80)
+      ];
+
+      loop(shapesList, function (obj, i) {
+          obj.match = targetsList[i];
+      });
+
+      shuffleTargets();
+      function shuffleTargets() {
+          // stop lists from being the same
+          var same = true;
+          while (same) {
+             // loop returns true if it makes it all the way
+             same = loop(targetsList, function (obj, i) {
+                 // put false into same if shapes are different
+                 if (obj.type != shapesList[i].type) return false;
+             });
+             if (same) shuffle(targetsList);
+          }
+      }
+
+      // tile the targets and objects
+      var targets = new Tile(series(targetsList), 3, 1, 60)
+          .pos(0,180,CENTER)
+          .alp(0)
+          .animate({
+              wait:500,
+              props:{alpha:1}
+          });
+      var objects = new Tile(series(shapesList), 3, 1, 60)
+          .drag()
+          .pos(0,130,CENTER,BOTTOM);
+
+      STYLE = {};
+
+      // Record start locations to snap back to
+      objects.loop(function (obj) {
+          obj.startX = obj.x;
+          obj.startY = obj.y;
+      })
+
+      // Create the shape where we draw the line
+      var shape = new Shape().addTo().ord(-1);
+
+      // Record which shape has been picked up
+      var currentShape;
+      objects.on("mousedown", function (e) {
+          currentShape = e.target;
+      });
+      Ticker.add(function () {
+          if (currentShape) {
+              var obj = currentShape;
+              // shape is on stage but objects are in tiles
+              // so need to get global positions that match position in parent
+              var point1 = obj.parent.localToGlobal(obj.startX, obj.startY);
+              var point2 = obj.parent.localToGlobal(obj.x, obj.y);
+              shape.c().s(red).ss(4)
+                  .mt(point1.x, point1.y)
+                  .lt(point2.x, point2.y);
+          }
+      });
+      objects.on("pressup", function (e) {
+
+          // Test to see if object is hitting target
+          obj = e.target;
+          if (obj.hitTestBounds(obj.match)) { // if match
+
+              obj.loc(obj.match).noMouse(); // don't let user pick up object
+              obj.match.removeFrom();
+              emitter.loc(obj).spurt(10);
+              shape.c();
+              currentShape = null;
+
+              if (targets.numChildren==0) { // end game
+                  objects.animate({
+                      props:{scale:1.5},
+                      time:200,
+                      rewind:true,
+                      loop:true,
+                      loopCount:2,
+                      sequence:100
+                  });
+                  replay.addTo().alp(0).animate({
+                      wait:1000,
+                      props:{alpha:1}
+                  });
+              }
+
+          } else { // snap back - no match
+
+              objects.noMouse();
+              obj.animate({
+                  props:{x:obj.startX, y:obj.startY},
+                  time:500,
+                  ease:"bounceOut",
+                  call:function () {
+                      objects.mouse();
+                      currentShape = null;
+                  }
+              });
+
+          }
+      });
+
+      var emitter = new Emitter({obj:new Circle(15,["#2bed6c","#057a2c","#9bd14f"],dark), startPaused:true});
+
+      var replay = new Button({
+          label:"RESTART",
+          backgroundColor:"#ff5964",
+          rollBackgroundColor:"#6bf178",
+          corner:5
+      })
+          .pos(0,100,CENTER,CENTER)
+          .removeFrom()
+          .tap(function() {
+              replay.removeFrom();
+
+              // restarting is always tricky
+              // you could just use zgo("matchingGame.html")
+              objects.loop(function(obj) {
+                  obj.animate({
+                      props:{x:obj.startX, y:obj.startY},
+                      time:700,
+                      ease:"backOut",
+                      call:function () {
+                          obj.mouse(); // add mouse control back
+                      }
+                  });
+              });
+              shuffle(targetsList); // otherwise are all good and won't shuffle!
+              shuffleTargets();
+              targets.removeFrom();
+              STYLE = {clone:false}; // IMPORTANT as STYLE was turned off
+              // or we could add clone false to Tile as we make it
+              // but we DO NOT want to clone because our match property would be lost
+              targets = new Tile(series(targetsList), 3, 1, 60)
+                  .pos(0,180,CENTER)
+                  .alp(0)
+                  .bot()
+                  .ord(1) // above backing stripes
+                  .animate({
+                      wait:1000,
+                      props:{alpha:1}
+                  });
+              stage.update();
+          });
+        });
+      // page2.triangle.on("mousedown",()=>{
+      //   //pages.go(page2,"right","slide")
+      //   pages.go(page1,"left")
+      // });
+
+    const pages = new Pages([
+      {page:page1, swipe:[page2, page2, "help", "help"]},
+      {page:page2, swipe:[page1, page1, "help", "help"]}
+    ], "slide", 500).addTo();
+
+
+    frame.on("resize", ()=>{
+      stageW=frame.width;
+      stageH=frame.height;
+
+      page1.setBounds(stageW,stageH);
+      page1.backing.siz(stageW, stageH);
+      page1.triangle.center();
+      page1.title.pos(frame.width*0.06,100);
+      page1.proceed.pos(frame.width*0.32,600);
+
+      page2.setBounds(stageW,stageH);
+      page2.backing.siz(stageW, stageH);
+      // page2.triangle.center();
+
+      pages.resize();
+    });
+
+    stage.update(); // this is needed to show any changes
+
+}); // end of ready
+
+</script>
+
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+
+</head>
+
+<body>
+<!-- canvas with id="myCanvas" is made by zim Frame -->
+</body>
+</html>
