@@ -2,16 +2,16 @@
 
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
-        id        = "com.danzen.tilty"
+        id        = "com.robcottignies.shapematch202"
         version   = "3.0.1">
 
     <name>Tilty</name>
 
     <description>
-        Mobile game to keep your device level while jostling others!
+        Mobile game help shape matching skills for kids!
     </description>
 
-    <author href="http://danzen.com" email="support@danzen.com">
+    <author href="http://www.robcottignies.com" email="cottigni@sheridancollege.ca">
        Dan Zen
     </author>
 
