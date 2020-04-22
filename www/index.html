@@ -46,22 +46,23 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
     page1.triangle = new Triangle(80,80,80,white)
       .alp(0.8)
       .hov(1)
-      .rot(90)
       .center(page1);
 
     page1.title = new Label({
       text:"Welcome to Shape Match 2020",
       size:35,
       font:"helvetica",
-      color:"white"
+      color:"white",
+      align:"center"
     }).addTo(page1).pos(frame.width*0.20,100);
 
     page1.proceed = new Label({
-      text:"Click Play to proceed",
+      text:"Click Triangle to proceed\n\n(Drag the blue shapes to the yellow shapes)",
       size:20,
       font:"helvetica",
-      color:"white"
-    }).addTo(page1).pos(frame.width*0.25,600);
+      color:"white",
+      align:"center"
+    }).addTo(page1).pos(frame.width*0.20,600);
 
       page1.triangle.on("mousedown",()=>{
         //pages.go(page2,"right","slide")
@@ -73,14 +74,20 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
     page2.triangle = new Triangle(80,80,80,dark)
       .alp(0.8)
       .hov(1)
-      .rot(90)
-      .center(page2);
+      .center(page2)
+      .tap(function () {
+          zog("start");
+          page2.triangle.removeFrom();
+          page2.play.removeFrom();
+       stage.update();
+       });
 
       page2.play = new Label({
-        text:"Click Play to start",
+        text:"Click the Triangle to start",
         size:20,
         font:"helvetica",
-        color:dark
+        color:dark,
+        align:"center"
       }).addTo(page2).pos(frame.width*0.35,600);
 
     page2.triangle.on("mousedown",()=>{
@@ -213,8 +220,8 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
 
       var replay = new Button({
           label:"RESTART",
-          backgroundColor:"#ff5964",
-          rollBackgroundColor:"#6bf178",
+          backgroundColor:"#6bf178",
+          rollBackgroundColor:"red",
           corner:5
       })
           .pos(0,100,CENTER,CENTER)
@@ -270,8 +277,8 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
       page1.setBounds(stageW,stageH);
       page1.backing.siz(stageW, stageH);
       page1.triangle.center();
-      page1.title.pos(frame.width*0.06,100);
-      page1.proceed.pos(frame.width*0.32,600);
+      page1.title.pos(10,100);
+      page1.proceed.pos(40,600);
 
       page2.setBounds(stageW,stageH);
       page2.backing.siz(stageW, stageH);
