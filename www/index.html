@@ -57,7 +57,7 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
     }).addTo(page1).pos(frame.width*0.20,100);
 
     page1.proceed = new Label({
-      text:"Click Triangle to proceed\n\n(Drag the blue shapes to the yellow shapes)",
+      text:"Click Triangle to proceed\n\n(Drag the blue shapes to the yellow)",
       size:20,
       font:"helvetica",
       color:"white",
@@ -65,7 +65,6 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
     }).addTo(page1).pos(frame.width*0.20,600);
 
       page1.triangle.on("mousedown",()=>{
-        //pages.go(page2,"right","slide")
         pages.go(page2,"right")
       });
 
@@ -76,7 +75,6 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
       .hov(1)
       .center(page2)
       .tap(function () {
-          zog("start");
           page2.triangle.removeFrom();
           page2.play.removeFrom();
        stage.update();
@@ -100,15 +98,14 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
           clone:false
       }
 
-      // these are what we drag
       var shapesList = [
           new Rectangle(80,80),
           new Circle(40),
           new Triangle(80,80,80)
       ];
 
-      // these are what we drag to
       STYLE.color = yellow;
+
       var targetsList = [
           new Rectangle(80,80),
           new Circle(40),
@@ -164,11 +161,9 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
       Ticker.add(function () {
           if (currentShape) {
               var obj = currentShape;
-              // shape is on stage but objects are in tiles
-              // so need to get global positions that match position in parent
               var point1 = obj.parent.localToGlobal(obj.startX, obj.startY);
               var point2 = obj.parent.localToGlobal(obj.x, obj.y);
-              shape.c().s(red).ss(4)
+              shape.c().s(green).ss(4)
                   .mt(point1.x, point1.y)
                   .lt(point2.x, point2.y);
           }
@@ -177,7 +172,7 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
 
           // Test to see if object is hitting target
           obj = e.target;
-          if (obj.hitTestBounds(obj.match)) { // if match
+          if (obj.hitTestBounds(obj.match)) {
 
               obj.loc(obj.match).noMouse(); // don't let user pick up object
               obj.match.removeFrom();
@@ -185,7 +180,7 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
               shape.c();
               currentShape = null;
 
-              if (targets.numChildren==0) { // end game
+              if (targets.numChildren==0) {
                   objects.animate({
                       props:{scale:1.5},
                       time:200,
@@ -199,9 +194,7 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
                       props:{alpha:1}
                   });
               }
-
-          } else { // snap back - no match
-
+          } else {
               objects.noMouse();
               obj.animate({
                   props:{x:obj.startX, y:obj.startY},
@@ -212,7 +205,6 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
                       currentShape = null;
                   }
               });
-
           }
       });
 
@@ -229,29 +221,25 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
           .tap(function() {
               replay.removeFrom();
 
-              // restarting is always tricky
-              // you could just use zgo("matchingGame.html")
               objects.loop(function(obj) {
                   obj.animate({
                       props:{x:obj.startX, y:obj.startY},
                       time:700,
                       ease:"backOut",
                       call:function () {
-                          obj.mouse(); // add mouse control back
+                          obj.mouse();
                       }
                   });
               });
-              shuffle(targetsList); // otherwise are all good and won't shuffle!
+              shuffle(targetsList);
               shuffleTargets();
               targets.removeFrom();
-              STYLE = {clone:false}; // IMPORTANT as STYLE was turned off
-              // or we could add clone false to Tile as we make it
-              // but we DO NOT want to clone because our match property would be lost
+              STYLE = {clone:false};
               targets = new Tile(series(targetsList), 3, 1, 60)
                   .pos(0,180,CENTER)
                   .alp(0)
                   .bot()
-                  .ord(1) // above backing stripes
+                  .ord(1)
                   .animate({
                       wait:1000,
                       props:{alpha:1}
@@ -259,10 +247,7 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
               stage.update();
           });
         });
-      // page2.triangle.on("mousedown",()=>{
-      //   //pages.go(page2,"right","slide")
-      //   pages.go(page1,"left")
-      // });
+
 
     const pages = new Pages([
       {page:page1, swipe:[page2, page2, "help", "help"]},
@@ -278,18 +263,19 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
       page1.backing.siz(stageW, stageH);
       page1.triangle.center();
       page1.title.pos(10,100);
-      page1.proceed.pos(40,600);
+      page1.proceed.pos(30,600);
 
       page2.setBounds(stageW,stageH);
       page2.backing.siz(stageW, stageH);
-      // page2.triangle.center();
+      page2.triangle.center();
+      page2.play.pos(10,100);
 
       pages.resize();
     });
 
-    stage.update(); // this is needed to show any changes
+    stage.update();
 
-}); // end of ready
+});
 
 </script>
 
